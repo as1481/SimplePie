@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head><title>Simple Pie</title></head>
+<body onresize="onResize()">
+    <canvas id="myCanvas"></canvas>
+ 
+    <script type="text/javascript">
+        var data = [];
+        var key = [];
+        drawPie(data, key);
+ 
+        function onResize() {
+            drawPie(data, key);
+        }
+ 
+        function addValue() {
+            if (data.length < 24){
+                data.push(parseInt(document.getElementById("in").value));
+                key.push(document.getElementById("inKey").value);
+                console.log(data);
+                console.log(key);
+                drawPie(data, key);
+            }
+        }
+ 
+        function drawPie(data, key) {
+            var total = 0;
+            var cumulative = 0;
+            var sliceSize = new Array(data.length);
+            var piepos = 0;
+           
+            // Context
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            ctx.canvas.width = window.innerWidth - 10;
+            ctx.canvas.height = window.innerHeight - 60;
+ 
+            // Colours
+            var colours = ["#0000FF", "#00FF00", "#FF0000", "#FF00FF", "#00FFFF"];
+ 
+            // Positions
+            var xpos = ctx.canvas.width / 3;
+            var ypos = ctx.canvas.height / 2;
+            var radius = 0;
+            var start = Math.PI * 0.5;
+            var keyx = ctx.canvas.width * 0.7;
+            var keyy = ctx.canvas.height / 6;
+ 
+            // Calculating a radius for the pie
+            if (ctx.canvas.height > ctx.canvas.width) {
+                radius = ctx.canvas.width / 3;
+            }
+            else {
+                radius = ctx.canvas.height / 3;
+            }
+ 
+            // Calcualte the total of the input data
+            for (i = 0; i < data.length; i++) {
+                total += data[i];
+            }
+ 
+            // Calcualte the portion of the pie for each peice of data
+            for (i = 0; i < data.length; i++) {
+                if (data[i] != 0) {
+                    sliceSize[i] = (data[i] / total) * Math.PI * 2;
+                }
+            }
+ 
+            // Draw key
+            for (i = 0; i < key.length; i++) {
+                if ((i == key.length - 1) && (key.length % colours.length == 1)) {
+                    ctx.fillStyle = colours[1];
+                }
+                else {
+                    ctx.fillStyle = colours[i % colours.length];
+                }
+ 
+                ctx.font = (30 * (ctx.canvas.height / 1080)).toString() + "px Arial";
+                ctx.fillText(key[i] + " : " + data[i], keyx, keyy + i * ctx.canvas.height * 0.03);
+            }
+ 
+            // Draw pie sectors
+            for (i = 0; i < data.length; i++) {
+                if ((i == data.length - 1) && (data.length % colours.length == 1)) {
+                    ctx.fillStyle = colours[1];
+                }
+                else {
+                    ctx.fillStyle = colours[i % colours.length];
+                }
+ 
+                ctx.beginPath();
+                ctx.arc(xpos, ypos, radius, piepos - start, piepos + sliceSize[i] - start);
+                ctx.lineTo(xpos, ypos);
+                piepos += sliceSize[i];
+                ctx.fill();
+            }
+ 
+            // Draw border
+            piepos = 0;
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 2;
+ 
+            for (i = 0; i < data.length; i++) {
+                ctx.beginPath();
+                ctx.arc(xpos, ypos, radius, piepos - start, piepos - start);
+                ctx.lineTo(xpos, ypos);
+                piepos += sliceSize[i];
+                ctx.stroke();
+            }
+ 
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.arc(xpos, ypos, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+ 
+    </script>
+ 
+    <form style="float:left">
+        Pie Value:
+        <input id="in" type="number" name="inputValue" min="1" max="9007199254740992"/>
+        <input id="inKey" type="tel" name="inputKey"/>
+    </form>
+ 
+    <button style="float:left" onclick="addValue()">
+        Add Value
+    </button>
+</body>
+</html>
